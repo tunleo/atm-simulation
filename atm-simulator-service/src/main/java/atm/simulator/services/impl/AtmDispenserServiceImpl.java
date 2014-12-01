@@ -83,9 +83,8 @@ public class AtmDispenserServiceImpl implements AtmDispenserService {
 
 	@Override
 	public List<BankNote> handleDispenseBankNotes() {
-        
 		List<BankNote> moneyDispensed = dispense();
-		
+
         if (next != null){
             moneyDispensed.addAll(next.handleDispenseBankNotes());
         }
@@ -94,7 +93,7 @@ public class AtmDispenserServiceImpl implements AtmDispenserService {
     }
 	
 	private List<BankNote> dispense(){
-		List<BankNote> moneyDispensed = new ArrayList<BankNote>();
+		List<BankNote> moneyDispensed = new ArrayList<>();
 
         if (notesToDispense > 0) {
             moneyDispensed.add(new BankNote(noteType, notesToDispense));
