@@ -23,6 +23,11 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
     private AtmDispenserService firstDispenser = null;
 
     ConcurrentHashMap<BankNoteType, AtmDispenserService> strongBox = new ConcurrentHashMap<>();
+    
+    public AtmStrongBoxServiceImpl() {
+    	logger.info("calling constructor..");
+    	initialise();
+	}
 
     @Override
     public synchronized void initialise() {
@@ -87,14 +92,14 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
     @Override
     public synchronized List<BankNote> withdraw(long value) throws AtmServiceException {
         validateWithdraw(value);
-        long balance = firstDispenser.handleRequestCalculateDispenseNoteAmount(value);
+        long balance = firstDispenser.handleCalculateNoteAmount(value);
         logger.debug("balance after dispensed : "+balance);
         if (balance > 0) {
             throw new AtmServiceException("The combination of notes available didn't satisfy your request, " +
                                    "please select another amount and try it again.");
         }
         
-        return firstDispenser.handleRequestDispenseBankNotes();
+        return firstDispenser.handleDispenseBankNotes();
     }
 
     private void validateWithdraw(long value) throws AtmServiceException {
@@ -133,7 +138,7 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
     }
 
     @Override
-    public synchronized boolean hasEnoughCashFor(long value) {
+    public synchronized boolean hasEnoughCash(long value) {
     	return availableMoney() >= value;
     }
 

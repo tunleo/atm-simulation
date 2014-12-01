@@ -17,7 +17,7 @@ public interface AtmStrongBoxService {
 	
 	public long getMinimalWithdrawValue();
 
-    public boolean hasEnoughCashFor(long value);
+    public boolean hasEnoughCash(long value);
 
     public long sumTotalMoney();
 }

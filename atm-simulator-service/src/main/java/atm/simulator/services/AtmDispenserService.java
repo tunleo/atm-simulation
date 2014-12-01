@@ -7,11 +7,11 @@ import atm.simulator.services.exception.AtmServiceException;
 
 public interface AtmDispenserService {
 	
-	public long handleRequestCalculateDispenseNoteAmount(long value) throws AtmServiceException;
+	public long handleCalculateNoteAmount(long value) throws AtmServiceException;
 	
 	public long predetermine(long value);
 	
-	public List<BankNote> handleRequestDispenseBankNotes();
+	public List<BankNote> handleDispenseBankNotes();
 	
 	public void setNext(AtmDispenserService dispenser);
 	

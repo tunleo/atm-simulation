@@ -103,12 +103,15 @@ public class AtmInitialiserTest extends AbstractServiceTest {
     
     @Test
     public void getMinimalWithdrawValue_shouldBeUpdated_afterEachLastWithdraw() throws AtmServiceException {
-        ArrayList<BankNote> bankNotes = Lists.newArrayList(bankNote(BankNoteType.TWENTY, 4), bankNote(BankNoteType.FIFTY, 1));
+    	long bankNoteTwentyQty = 4;
+    	long bankNoteFiftyQty = 1;
+        ArrayList<BankNote> bankNotes 
+        			= Lists.newArrayList(bankNote(BankNoteType.TWENTY, bankNoteTwentyQty), bankNote(BankNoteType.FIFTY, bankNoteFiftyQty));
 
         strongBox.initialise();
         Assert.assertTrue(strongBox.sumTotalMoney()==0);
         strongBox.addMoney(bankNotes);
-        Assert.assertEquals(strongBox.sumTotalMoney(), (20 * 4) + (50 * 1));
+        Assert.assertEquals(strongBox.sumTotalMoney(), (BankNoteType.TWENTY.getValue() * bankNoteTwentyQty) + (BankNoteType.FIFTY.getValue() * bankNoteFiftyQty));
         Assert.assertEquals(20,strongBox.getMinimalWithdrawValue());
 
         List<BankNote> withdrawBankNotes = strongBox.withdraw(80);
@@ -123,7 +126,7 @@ public class AtmInitialiserTest extends AbstractServiceTest {
         strongBox.initialise();
         strongBox.addMoney(bankNotes);
 
-        Assert.assertTrue(strongBox.hasEnoughCashFor(400));
+        Assert.assertTrue(strongBox.hasEnoughCash(400));
     }
     
     @Test
@@ -133,6 +136,6 @@ public class AtmInitialiserTest extends AbstractServiceTest {
         strongBox.initialise();
         strongBox.addMoney(bankNotes);
 
-        Assert.assertFalse(strongBox.hasEnoughCashFor(200));
+        Assert.assertFalse(strongBox.hasEnoughCash(200));
     }
 }
