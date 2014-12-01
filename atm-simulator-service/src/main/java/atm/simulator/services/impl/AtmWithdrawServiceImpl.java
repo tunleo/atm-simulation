@@ -13,37 +13,32 @@ import atm.simulator.services.exception.AtmServiceException;
 public class AtmWithdrawServiceImpl implements AtmWithdrawService {
 	
 	@Autowired
-	private AtmStrongBoxServiceImpl coffer;
+	private AtmStrongBoxServiceImpl strongBox;
 	
 	@Override
-	public List<BankNote> withdraw(long value) {
+	public List<BankNote> withdraw(long value) throws AtmServiceException {
 		try {
-			return coffer.withdraw(value);
-		} catch (AtmServiceException e) {
-			//TODO handle
+			return strongBox.withdraw(value);
 		} catch (Exception e) {
-			//TODO handle
+			throw new AtmServiceException(e);
 		}
-		return null;
     }
 	
 	@Override
-	public long minimumValueWithdraw() {
+	public long minimumValueWithdraw() throws AtmServiceException {
         try {
-            return (coffer.getMinimalWithdrawValue());
+            return (strongBox.getMinimalWithdrawValue());
         } catch (Exception e) {
-        	//TODO handle
+        	throw new AtmServiceException(e);
         }
-        return 0;
     }
 
 	@Override
-    public long maximumValueWithdraw() {
+    public long maximumValueWithdraw() throws AtmServiceException {
     	try {
-    		return coffer.sumTotalMoney();
+    		return strongBox.sumTotalMoney();
     	} catch (Exception e) {
-    		//TODO handle
+    		throw new AtmServiceException(e);
     	}
-    	return 0;
 	}
 }

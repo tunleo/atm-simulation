@@ -31,7 +31,7 @@ public class AtmMoneyDispenseTest {
         dispenser.addNotes(4);
         Assert.assertEquals(4, dispenser.getNumberOfNotes());
 
-        long balance = dispenser.handleRequestCalculateDispenseNoteAmount(120);
+        long balance = dispenser.handleCalculateNoteAmount(120);
 
         Assert.assertEquals(120,balance);
     }
@@ -41,7 +41,7 @@ public class AtmMoneyDispenseTest {
     	AtmDispenserService dispenser = new AtmDispenserServiceImpl(BankNoteType.FIFTY);
     	dispenser.addNotes(2);
     	
-    	long balance = dispenser.handleRequestCalculateDispenseNoteAmount(40);
+    	long balance = dispenser.handleCalculateNoteAmount(40);
 
     	Assert.assertEquals(40,balance);
     }
@@ -53,9 +53,9 @@ public class AtmMoneyDispenseTest {
 
     	dispenser.setNext(next);
     	dispenser.addNotes(2);
-    	dispenser.handleRequestCalculateDispenseNoteAmount(30);
+    	dispenser.handleCalculateNoteAmount(30);
 
-    	verify(next).handleRequestCalculateDispenseNoteAmount(10);
+    	verify(next).handleCalculateNoteAmount(10);
     }
     
 	@Test
@@ -64,8 +64,8 @@ public class AtmMoneyDispenseTest {
 		dispenser.addNotes(3);
 		Assert.assertEquals(3,dispenser.getNumberOfNotes());
 
-		dispenser.handleRequestCalculateDispenseNoteAmount(100);
-		List<BankNote> moneyDispensed = dispenser.handleRequestDispenseBankNotes();
+		dispenser.handleCalculateNoteAmount(100);
+		List<BankNote> moneyDispensed = dispenser.handleDispenseBankNotes();
 
 		Assert.assertEquals(1,dispenser.getNumberOfNotes());
 		Assert.assertTrue(moneyDispensed.contains(new BankNote(BankNoteType.FIFTY, 2)));
@@ -77,8 +77,8 @@ public class AtmMoneyDispenseTest {
 		dispenser.addNotes(3);
 		Assert.assertEquals(3, dispenser.getNumberOfNotes());
 
-		dispenser.handleRequestCalculateDispenseNoteAmount(120);
-		List<BankNote> moneyDispensed = dispenser.handleRequestDispenseBankNotes();
+		dispenser.handleCalculateNoteAmount(120);
+		List<BankNote> moneyDispensed = dispenser.handleDispenseBankNotes();
 
 		Assert.assertEquals(3, dispenser.getNumberOfNotes());
 		Assert.assertTrue(moneyDispensed.isEmpty());
@@ -93,9 +93,9 @@ public class AtmMoneyDispenseTest {
 		dispenser.addNotes(3);
 		Assert.assertEquals(3,dispenser.getNumberOfNotes());
 
-		dispenser.handleRequestCalculateDispenseNoteAmount(120);
-		dispenser.handleRequestDispenseBankNotes();
+		dispenser.handleCalculateNoteAmount(120);
+		dispenser.handleDispenseBankNotes();
 
-		verify(next).handleRequestDispenseBankNotes();
+		verify(next).handleDispenseBankNotes();
     }
 }

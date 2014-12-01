@@ -11,13 +11,13 @@ public interface AtmStrongBoxService {
 	
 	public void addMoney(List<BankNote> money) throws AtmServiceException;
 	
-	public List<BankNote> getMoney();
+	public List<BankNote> getBankNotes();
 	
 	public List<BankNote> withdraw(long value) throws AtmServiceException;
 	
 	public long getMinimalWithdrawValue();
 
-    public boolean hasEnoughCashFor(long value);
+    public boolean hasEnoughCash(long value);
 
     public long sumTotalMoney();
 }

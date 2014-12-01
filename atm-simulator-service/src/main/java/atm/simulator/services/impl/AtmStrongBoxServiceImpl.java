@@ -23,6 +23,11 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
     private AtmDispenserService firstDispenser = null;
 
     ConcurrentHashMap<BankNoteType, AtmDispenserService> strongBox = new ConcurrentHashMap<>();
+    
+    public AtmStrongBoxServiceImpl() {
+    	logger.info("calling constructor..");
+    	initialise();
+	}
 
     @Override
     public synchronized void initialise() {
@@ -48,7 +53,7 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
 
     @Override
     public synchronized void addMoney(List<BankNote> bankNotes) throws AtmServiceException {
-    	validateMoney(bankNotes);
+    	validateBankNotes(bankNotes);
     	for (BankNote bankNote: bankNotes) {
     		AtmDispenserService dispenser = strongBox.get(bankNote.getNoteType());
     		if (dispenser == null){
@@ -58,7 +63,7 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
     	}
 	}
 
-    private void validateMoney(List<BankNote> bankNotes) throws AtmServiceException {
+    private void validateBankNotes(List<BankNote> bankNotes) throws AtmServiceException {
     	for (BankNote bankNote: bankNotes) {
     		if (bankNote.getNoteType() == null){
     			throw new AtmServiceException("An invalid note was specified [" + bankNote + "]");
@@ -73,7 +78,7 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
     }
     
     @Override
-    public synchronized List<BankNote> getMoney() {
+    public synchronized List<BankNote> getBankNotes() {
         ArrayList<BankNote> bankNotes = new ArrayList<BankNote>();
         for (BankNoteType note : BankNoteType.values()) {
         	AtmDispenserService dispenser = strongBox.get(note);
@@ -87,14 +92,14 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
     @Override
     public synchronized List<BankNote> withdraw(long value) throws AtmServiceException {
         validateWithdraw(value);
-        long balance = firstDispenser.handleRequestCalculateDispenseNoteAmount(value);
+        long balance = firstDispenser.handleCalculateNoteAmount(value);
         logger.debug("balance after dispensed : "+balance);
         if (balance > 0) {
             throw new AtmServiceException("The combination of notes available didn't satisfy your request, " +
                                    "please select another amount and try it again.");
         }
         
-        return firstDispenser.handleRequestDispenseBankNotes();
+        return firstDispenser.handleDispenseBankNotes();
     }
 
     private void validateWithdraw(long value) throws AtmServiceException {
@@ -133,7 +138,7 @@ public class AtmStrongBoxServiceImpl implements AtmStrongBoxService{
     }
 
     @Override
-    public synchronized boolean hasEnoughCashFor(long value) {
+    public synchronized boolean hasEnoughCash(long value) {
     	return availableMoney() >= value;
     }
 

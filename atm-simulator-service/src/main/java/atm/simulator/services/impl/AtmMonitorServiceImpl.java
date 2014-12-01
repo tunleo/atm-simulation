@@ -7,20 +7,20 @@ import org.springframework.stereotype.Service;
 
 import atm.simulator.domain.BankNote;
 import atm.simulator.services.AtmMonitorService;
+import atm.simulator.services.exception.AtmServiceException;
 
 @Service
 public class AtmMonitorServiceImpl implements AtmMonitorService{
 	
 	@Autowired
-	private AtmStrongBoxServiceImpl coffer;
+	private AtmStrongBoxServiceImpl strongBox;
 	
 	@Override
-	public List<BankNote> getAvailableMoney() {
+	public List<BankNote> getAvailableMoney() throws AtmServiceException {
 		try {
-			return coffer.getMoney();
+			return strongBox.getBankNotes();
 		} catch (Exception e) {
-			//TODO handle
+			throw new AtmServiceException(e);
 		}
-		return null;
 	}
 }

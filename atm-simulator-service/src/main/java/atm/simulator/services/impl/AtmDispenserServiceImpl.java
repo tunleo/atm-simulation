@@ -26,14 +26,15 @@ public class AtmDispenserServiceImpl implements AtmDispenserService {
     }
 
     @Override
-    public long handleRequestCalculateDispenseNoteAmount(long value) throws AtmServiceException {
+    public long handleCalculateNoteAmount(long value) throws AtmServiceException {
         long balance = value;
         notesToDispense = 0;
         logger.debug("input value : " + value);
         logger.debug("calculate note type : " + noteType.getValue());
         if (value >= noteType.getValue()) {
-            notesToDispense = value / noteType.getValue();
+            notesToDispense = (value / noteType.getValue());
             logger.debug("note to dispense : " + notesToDispense);
+            logger.debug("numberOfNotes : " + numberOfNotes);
             while (notesToDispense > 0) {
                 if (notesToDispense > numberOfNotes.get()) {
                     notesToDispense = numberOfNotes.get();
@@ -47,7 +48,8 @@ public class AtmDispenserServiceImpl implements AtmDispenserService {
                     break;
                 }
 
-                long predeterminedBalance = predetermine(balance);
+                long predeterminedBalance = handlePredetermine(balance);
+                logger.debug("predeterminedBalance : " + predeterminedBalance);
                 if (predeterminedBalance == 0){
                     break;
                 }
@@ -56,39 +58,52 @@ public class AtmDispenserServiceImpl implements AtmDispenserService {
                 balance = value - (notesToDispense * noteType.getValue());
             }
         }
+        logger.debug("balance before go next : " + balance);
         logger.debug("===========calling-next===============");
-        return (next != null) ? next.handleRequestCalculateDispenseNoteAmount(balance) : balance;
+        return (next != null) ? next.handleCalculateNoteAmount(balance) : balance;
     }
 
 	@Override
-    public long predetermine(long value) {
-    	long balance = value;
+    public long handlePredetermine(long value) {
+    	long balance = predetermine(value);
 
-    	if (value >= noteType.getValue()) {
+        return (next != null) ? next.handlePredetermine(balance) : balance;
+    }
+	
+	private long predetermine(long value){
+		if (value >= noteType.getValue()) {
             long dispenseNotes = (value / noteType.getValue());
             if (dispenseNotes > numberOfNotes.get()) {
                 dispenseNotes = numberOfNotes.get();
             }
-            balance = value - (dispenseNotes * noteType.getValue());
+            return value - (dispenseNotes * noteType.getValue());
         }
-        return (next != null) ? next.predetermine(balance) : balance;
-    }
+		return value;
+	}
 
 	@Override
-	public List<BankNote> handleRequestDispenseBankNotes() {
-        List<BankNote> moneyDispensed = new ArrayList<>();
+	public List<BankNote> handleDispenseBankNotes() {
+        
+		List<BankNote> moneyDispensed = dispense();
+		
+        if (next != null){
+            moneyDispensed.addAll(next.handleDispenseBankNotes());
+        }
+
+        return moneyDispensed;
+    }
+	
+	private List<BankNote> dispense(){
+		List<BankNote> moneyDispensed = new ArrayList<BankNote>();
 
         if (notesToDispense > 0) {
             moneyDispensed.add(new BankNote(noteType, notesToDispense));
             numberOfNotes.addAndGet(notesToDispense * -1);
             notesToDispense = 0;
         }
-
-        if (next != null)
-            moneyDispensed.addAll(next.handleRequestDispenseBankNotes());
-
+        
         return moneyDispensed;
-    }
+	}
 
 	@Override
 	public void setNext(AtmDispenserService dispenser) {
@@ -102,7 +117,10 @@ public class AtmDispenserServiceImpl implements AtmDispenserService {
 
     @Override
 	public long addNotes(long quantity) {
-        return numberOfNotes.addAndGet(quantity);
+    	long totalNumberOfNote = numberOfNotes.addAndGet(quantity);
+    	logger.debug("noteType : " + noteType);
+    	logger.debug("totalNumberOfNote : " + numberOfNotes);
+        return totalNumberOfNote;
     }
 	
 	
